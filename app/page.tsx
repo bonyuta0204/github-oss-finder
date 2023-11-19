@@ -1,29 +1,30 @@
 'use client'
-import { gql, useQuery } from '@apollo/client'
+import { useQuery } from '@apollo/client'
+import { gql } from '@/types/__generated__/gql'
 
 export default function Home() {
-  const ISSUES_QUERY = gql`
+  const ISSUES_QUERY = gql(/* GraphQL */ `
     query SearchIssues($query: String!) {
-      search(query: $query, type: ISSUE, first: 10) {
-        edges {
-          node {
-            ... on Issue {
-              id
-              title
-              url
-              labels(first: 5) {
-                edges {
-                  node {
-                    name
-                  }
-                }
-              }
-            }
-          }
+      search(query: $query, type: ISSUE, last: 100) {
+        nodes {
+          ...IssueFragment
         }
       }
     }
-  `
+
+    fragment IssueFragment on Issue {
+      id
+      title
+      labels(first: 100) {
+        nodes {
+          name
+        }
+      }
+      repository {
+        name
+      }
+    }
+  `)
 
   const { data, loading, error } = useQuery(ISSUES_QUERY, {
     variables: { query: `is:issue language:typescript` }
@@ -57,7 +58,13 @@ export default function Home() {
         <div className="flex-col">
           <div>
             <label>data</label>
-            <div>{JSON.stringify(data)}</div>
+            {data?.search?.nodes?.map((node) => {
+              return (
+                <div className="border-y border-blue-300">
+                  {JSON.stringify(node)}
+                </div>
+              )
+            })}
           </div>
           <div>
             <label>error</label>
