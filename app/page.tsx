@@ -1,35 +1,9 @@
 'use client'
-import { useQuery } from '@apollo/client'
-import { gql } from '@/types/__generated__/gql'
+
+import useIssues from '@/lib/github/hooks/useIssue'
 
 export default function Home() {
-  const ISSUES_QUERY = gql(/* GraphQL */ `
-    query SearchIssues($query: String!) {
-      search(query: $query, type: ISSUE, last: 100) {
-        nodes {
-          ...IssueFragment
-        }
-      }
-    }
-
-    fragment IssueFragment on Issue {
-      id
-      title
-      labels(first: 100) {
-        nodes {
-          name
-        }
-      }
-      repository {
-        name
-      }
-    }
-  `)
-
-  const { data, loading, error } = useQuery(ISSUES_QUERY, {
-    variables: { query: `is:issue language:typescript` }
-  })
-
+  const { issues, error } = useIssues('is:issue label:"help wanted"')
   /**
    * Main page for GitHub OSS Founder
    */
@@ -58,10 +32,17 @@ export default function Home() {
         <div className="flex-col">
           <div>
             <label>data</label>
-            {data?.search?.nodes?.map((node) => {
+            {issues?.map((issue) => {
               return (
-                <div className="border-y border-blue-300">
-                  {JSON.stringify(node)}
+                <div>
+                  <div>title: {issue.title}</div>
+                  <div>
+                    label:{' '}
+                    {issue.labels?.map((label) => {
+                      return <div>{label.name}</div>
+                    })}
+                  </div>
+                  <div>{issue.repository}</div>
                 </div>
               )
             })}
