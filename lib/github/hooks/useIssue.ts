@@ -49,4 +49,6 @@ const useIssues = (query: string) => {
   return { issues, loading, error }
 }
 
+export type Issue = NonNullable<ReturnType<typeof useIssues>['issues']>[number]
+
 export default useIssues

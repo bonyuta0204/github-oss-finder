@@ -1,5 +1,6 @@
 'use client'
 
+import IssueCard from '@/components/IssueCard'
 import useIssues from '@/lib/github/hooks/useIssue'
 
 export default function Home() {
@@ -29,24 +30,8 @@ export default function Home() {
         </div>
         <div className="divider"></div>
         <h2>Search Result</h2>
-        <div className="flex-col">
-          <div>
-            <label>data</label>
-            {issues?.map((issue) => {
-              return (
-                <div>
-                  <div>title: {issue.title}</div>
-                  <div>
-                    label:{' '}
-                    {issue.labels?.map((label) => {
-                      return <div>{label.name}</div>
-                    })}
-                  </div>
-                  <div>{issue.repository}</div>
-                </div>
-              )
-            })}
-          </div>
+        <div className="flex flex-col gap-4">
+          {issues?.map((issue) => <IssueCard key={issue.id} issue={issue} />)}
           <div>
             <label>error</label>
             <div>{JSON.stringify(error)}</div>
