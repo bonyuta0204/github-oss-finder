@@ -9,14 +9,25 @@ const ISSUES_QUERY = gql(/* GraphQL */ `
         ... on Issue {
           id
           title
+          titleHTML
+          url
+          publishedAt
           labels(first: 100) {
             nodes {
+              color
               name
+              url
             }
           }
           repository {
             id
             name
+            nameWithOwner
+            description
+            descriptionHTML
+            forkCount
+            stargazerCount
+            url
           }
         }
       }
@@ -30,17 +41,29 @@ const useIssues = (query: string) => {
   })
 
   const issues = data?.search?.nodes
-    ?.map((node) => {
-      if (node?.__typename === 'Issue') {
+    ?.map((issue) => {
+      if (issue?.__typename === 'Issue') {
         return {
-          id: node.id,
-          title: node.title,
-          labels: node.labels?.nodes
+          id: issue.id,
+          title: issue.title,
+          url: issue.url,
+          publishedAt: issue.publishedAt,
+          labels: issue.labels?.nodes
             ?.map((label) =>
-              label?.__typename === 'Label' ? { name: label.name } : undefined
+              label?.__typename === 'Label'
+                ? { name: label.name, color: label.color, url: label.url }
+                : undefined
             )
             .filter(nonNullable),
-          repository: node.repository.name
+          repository: {
+            name: issue.repository.name,
+            nameWithOwner: issue.repository.nameWithOwner,
+            description: issue.repository.description,
+            descriptipnHTML: issue.repository.descriptionHTML,
+            forkCount: issue.repository.forkCount,
+            stargazerCount: issue.repository.stargazerCount,
+            url: issue.repository.url
+          }
         }
       }
     })
