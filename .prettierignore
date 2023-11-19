@@ -1,3 +1,4 @@
 dist
 pnpm-lock.yaml
 cache
+types/__generated__/
